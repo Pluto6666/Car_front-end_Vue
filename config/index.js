@@ -10,7 +10,13 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+        //配置转发的域/api下面的请求均发起转发
+         '/api':{
+            target:'http://49.234.237.152:81',
+            changeOrigin:true
+         }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
