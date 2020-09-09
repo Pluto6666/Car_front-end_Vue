@@ -13,6 +13,12 @@ axios.defaults.withCredentials = true;
 import VueAxios from 'vue-axios'
 import qs from 'qs'
 import VDistpicker from 'v-distpicker'
+// 导入富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
+// 导入富文本编辑器对应的样式
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 
 Vue.use(Button)
 Vue.use(Form)
@@ -27,9 +33,11 @@ Vue.use(Submenu)
 Vue.use(MenuItemGroup)
 Vue.use(MenuItem)
 Vue.use(ElementUI)
-// 挂载到Vue全局
 
+// 将富文本编辑器注册为全局可用的组件
+Vue.use(VueQuillEditor)
 Vue.component('v-distpicker', VDistpicker)
+// 挂载到Vue全局
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
 

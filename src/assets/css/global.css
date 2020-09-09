@@ -30,3 +30,15 @@ body,
 .el-pagination  {
   margin-top: 15px;
 }
+
+.el-steps {
+  margin: 15px 500px;
+}
+
+.el-step__title {
+  font-size: 11px;
+}
+
+.ql-editor{
+  min-height: 500px;
+}

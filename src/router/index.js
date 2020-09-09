@@ -48,6 +48,10 @@ const Marketing = () =>
 const wz = () =>
 import ('@/components/car/wz')
 
+//导入人气推荐列表组件
+const AddNews = () =>
+  import ('@/components/social/AddNews')
+
 Vue.use(Router)
 
 export default new Router({
@@ -86,6 +90,9 @@ export default new Router({
       }, {
         path: '/wz',
         component: wz
+      },{
+        path:'/news/AddNews',
+        component:AddNews
       }
     ]
   } ]

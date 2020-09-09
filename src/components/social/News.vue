@@ -11,7 +11,7 @@
      
       <!--表格区域-->
       <!--搜索区域-->
-      <el-row :gutter="3">
+      <el-row :gutter="4">
           <el-col :span="2">
               <el-button @click="clearFilter">清除过滤器</el-button>
           </el-col>
@@ -19,6 +19,9 @@
               <el-input placeholder="请输入关键词" v-model="queryinfo.keyword" clearable>
             <el-button slot="append" icon="el-icon-search" @click="getNewsList()"></el-button>
           </el-input>
+          </el-col>
+          <<el-col :span="8">
+              <el-button type="primary" @click="goAddpage">新增新闻</el-button>
           </el-col>
       </el-row>
       <el-table
@@ -216,6 +219,10 @@ export default {
         console.log(error);
       });
       this.contentVisible=true;
+    },
+    //跳转新闻添加界面
+    goAddpage(){
+      this.$router.push('news/AddNews');
     }
   }
 }
