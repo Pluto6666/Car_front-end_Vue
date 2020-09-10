@@ -20,23 +20,18 @@
 	<el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px" label-position="top">
 		<el-tabs :tab-position="'top'" type="border-card" v-model="active">
       		<el-tab-pane label="基本信息" name="0">
-      			<el-form-item label="新闻id" prop="news_id">
-          			<el-input v-model="addForm.news_id"></el-input>
-        		</el-form-item>
       			<el-form-item label="新闻标题" prop="title">
           			<el-input v-model="addForm.title"></el-input>
         		</el-form-item>
         		<el-form-item label="新闻分区" prop="part">
-          			<el-input v-model="addForm.part"></el-input>
-        		</el-form-item>
-        		<el-form-item label="作者id" prop="author_id">
-          			<el-input v-model="addForm.author_id"></el-input>
-        		</el-form-item>
-        		<el-form-item label="作者用户名" prop="author_name">
-          			<el-input v-model="addForm.author_name"></el-input>
-        		</el-form-item>
-        		<el-form-item label="新闻日期" prop="post_date">
-          			<el-input v-model="addForm.post_date"></el-input>
+          			<el-select v-model="addForm.part" clearable placeholder="选择新闻分区">
+              			<el-option
+                			v-for="item in partList"
+                			:key="item.value"
+                			:label="item.label"
+                			:value="item.value">
+              			</el-option>
+            		</el-select>
         		</el-form-item>
       		</el-tab-pane>
       		<el-tab-pane label="编辑内容" name="1">
@@ -84,25 +79,16 @@ export default {
       	{
       		required: true, message: '请选择新闻分区', trigger: 'blur' 
       	}],
-      	author_id:[
-        { 
-        	required: true, message: '请输入7位用户id', trigger: 'blur' 
-        },
-        { 
-        	min: 7, max: 7, message: '长度必须为7位', trigger: 'blur' 
-        }],
-        author_name:[
-        { 
-        	required: true, message: '请输入用户名（昵称）', trigger: 'blur' 
-        },
-        { 
-        	min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' 
-        }],
         post_date:[
       	{
       		required: true, message: '请输入日期', trigger: 'blur' 
       	}]
-      }
+      },
+      partList:[
+        {value:"选车导购",label:"选车导购"},
+        {value:"行情分析",label:"行情分析"},
+        {value:"二手车实拍",label:"二手车实拍"}
+      ]
     }
   },
   methods:{
@@ -113,7 +99,28 @@ export default {
           return this.$message.error('请填写必要的表单项')
         }
         // 执行添加的业务逻辑
-        console.log(this.addForm);
+        var nowDate = new Date();
+        var year=nowDate.getFullYear();
+        var month=nowDate.getMonth()+1;
+        var date=nowDate.getDate();
+        var h=nowDate.getHours();
+        var m=nowDate.getMinutes();
+        var s=nowDate.getSeconds();
+
+        this.addForm.post_date =
+        		year+'/'+
+        		this.convert(month)+'/'+
+        		this.convert(date)+' '+
+        		this.convert(h)+':'+
+        		this.convert(m)+':'+
+        		this.convert(s);
+
+        this.addForm.news_id=this.randomString(7);
+        
+        //先默认作者
+        this.addForm.author_name="二手车编辑小雷";
+        this.addForm.author_id="3120216";
+
         Vue.axios.post('/api/news/add',this.addForm).then((response)=>{
         	if(response.data.code==1){
         		this.$message.success('新闻上传成功！');
@@ -126,8 +133,22 @@ export default {
   		});
   		this.$router.push('/news');
   	})
-  }
-}
+  },
+  //日期时间处理
+	convert(val) {
+  		return val < 10 ? '0' + val : val
+	},
+	//随机生成七位数
+	randomString(length){
+		var tmp="0123456789",
+		a=tmp.length,
+		res="";
+		for(var i=0;i<length;i++){
+			res+=tmp.charAt(Math.floor(Math.random() * a));
+		}
+		return res;
+	}
+ }
 }
 </script>
 

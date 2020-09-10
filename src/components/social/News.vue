@@ -20,7 +20,7 @@
             <el-button slot="append" icon="el-icon-search" @click="getNewsList()"></el-button>
           </el-input>
           </el-col>
-          <<el-col :span="8">
+          <el-col :span="8">
               <el-button type="primary" @click="goAddpage">新增新闻</el-button>
           </el-col>
       </el-row>
@@ -56,7 +56,7 @@
         <el-table-column 
         	prop="part" 
         	label="所属分区"
-        	:filters="[{text:'行情分析',value:'行情分析'},{text:'选车导购',value:'选车导购'},{text:'汽车测评',value:'汽车测评'}]"
+        	:filters="[{text:'行情分析',value:'行情分析'},{text:'选车导购',value:'选车导购'},{text:'二手车实拍',value:'二手车实拍'}]"
         	:filter-method="filterPt"
         	filter-placement="bottom-end"
           width=260>
