@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-08-15 12:19:30
- * @LastEditTime: 2020-09-08 19:22:42
+ * @LastEditTime: 2020-09-09 08:59:53
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \firstApp\src\pages\car\Category.vue
@@ -84,120 +84,121 @@
 </div>
 </template>
 
+<script>
 export default {
-  name: 'OpinManager',
-  mounted () {
-    this.initOptions()
-    this.initAllFeeds()
-  },
-  methods: {
-    openImg (url) {
-      if (url) {
-        this.imgVisible = true
-        this.dialogImgUrl = url
-      }
+    name: 'OpinManager',
+    mounted() {
+        this.initOptions()
+        this.initAllFeeds()
     },
-    handleCancel () {
-      this.imgVisible = false
-    },
-    initOptions () {
-      getRequest('/apps/appnames').then(resp => {
-        if (resp) {
-          this.options = resp.data
+    methods: {
+        openImg(url) {
+            if (url) {
+                this.imgVisible = true
+                this.dialogImgUrl = url
+            }
+        },
+        handleCancel() {
+            this.imgVisible = false
+        },
+        initOptions() {
+            getRequest('/apps/appnames').then(resp => {
+                if (resp) {
+                    this.options = resp.data
+                }
+            })
+        },
+        initAllFeeds() {
+            let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize
+            this.getFeeds(url)
+        },
+        getFeeds(url) {
+            this.loading = true
+            getRequest(url).then(resp => {
+                if (resp) {
+                    this.tableData = resp.data
+                    this.total = resp.total
+                }
+                this.loading = false
+            })
+        },
+        dateFormat(row, column, cellValue, index) {
+            let data = row[column.property]
+            if (data == null) {
+                return null
+            }
+            let dt = new Date(data)
+            return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds()
+        },
+        current_change: function (currentPage) {
+            this.currentPage = currentPage
+            if (this.optRecord.name != null && this.optRecord.date == null) {
+                let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&name=' + this.optRecord.name
+                this.getFeeds(url)
+            } else if (this.optRecord.name == null && this.optRecord.date != null) {
+                let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&beginDateScope=' + this.optRecord.date
+                this.getFeeds(url)
+            } else if (this.optRecord.name != null && this.optRecord.date != null) {
+                let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&name=' + this.optRecord.name + '&beginDateScope=' + this.optRecord.date
+                this.getFeeds(url)
+            } else {
+                let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize
+                this.getFeeds(url)
+            }
+        },
+        selectChanged() {
+            console.log(this.currentAppName)
+        },
+        handleQuery() {
+            if (this.currentAppName == null && this.formatDate == null) {
+                return
+            }
+            if (this.currentAppName != null && this.formatDate != null) {
+                if (this.currentAppName === this.optRecord.name && this.formatDate === this.optRecord.date) {
+                    return
+                }
+                this.optRecord.name = this.currentAppName
+                this.optRecord.date = this.formatDate
+                this.currentPage = 1
+                let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&name=' + this.currentAppName + '&beginDateScope=' + this.formatDate
+                this.getFeeds(url)
+            } else if (this.currentAppName != null) {
+                this.optRecord.name = this.currentAppName
+                this.currentPage = 1
+                let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&name=' + this.currentAppName
+                this.getFeeds(url)
+            } else if (this.formatDate != null && this.formatDate !== this.optRecord.date) {
+                this.optRecord.date = this.formatDate
+                this.currentPage = 1
+                let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&beginDateScope=' + this.formatDate
+                this.getFeeds(url)
+            }
         }
-      })
     },
-    initAllFeeds () {
-      let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize
-      this.getFeeds(url)
-    },
-    getFeeds (url) {
-      this.loading = true
-      getRequest(url).then(resp => {
-        if (resp) {
-          this.tableData = resp.data
-          this.total = resp.total
+    watch: {
+        formatDate(val) {
+            if (val == null) {
+                this.optRecord.date = null
+            }
         }
-        this.loading = false
-      })
     },
-    dateFormat (row, column, cellValue, index) {
-      let data = row[column.property]
-      if (data == null) {
-        return null
-      }
-      let dt = new Date(data)
-      return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds()
-    },
-    current_change: function (currentPage) {
-      this.currentPage = currentPage
-      if (this.optRecord.name != null && this.optRecord.date == null) {
-        let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&name=' + this.optRecord.name
-        this.getFeeds(url)
-      } else if (this.optRecord.name == null && this.optRecord.date != null) {
-        let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&beginDateScope=' + this.optRecord.date
-        this.getFeeds(url)
-      } else if (this.optRecord.name != null && this.optRecord.date != null) {
-        let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&name=' + this.optRecord.name + '&beginDateScope=' + this.optRecord.date
-        this.getFeeds(url)
-      } else {
-        let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize
-        this.getFeeds(url)
-      }
-    },
-    selectChanged () {
-      console.log(this.currentAppName)
-    },
-    handleQuery () {
-      if (this.currentAppName == null && this.formatDate == null) {
-        return
-      }
-      if (this.currentAppName != null && this.formatDate != null) {
-        if (this.currentAppName === this.optRecord.name && this.formatDate === this.optRecord.date) {
-          return
+    data() {
+        return {
+            imgVisible: false,
+            dialogImgUrl: null,
+            total: 0,
+            pagesize: 10,
+            currentPage: 1,
+            currentAppName: null,
+            formatDate: null,
+            loading: false,
+            options: [],
+            optRecord: {
+                name: null,
+                date: null
+            },
+            feedbasks: Array,
         }
-        this.optRecord.name = this.currentAppName
-        this.optRecord.date = this.formatDate
-        this.currentPage = 1
-        let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&name=' + this.currentAppName + '&beginDateScope=' + this.formatDate
-        this.getFeeds(url)
-      } else if (this.currentAppName != null) {
-        this.optRecord.name = this.currentAppName
-        this.currentPage = 1
-        let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&name=' + this.currentAppName
-        this.getFeeds(url)
-      } else if (this.formatDate != null && this.formatDate !== this.optRecord.date) {
-        this.optRecord.date = this.formatDate
-        this.currentPage = 1
-        let url = '/feedback/?page=' + this.currentPage + '&size=' + this.pagesize + '&beginDateScope=' + this.formatDate
-        this.getFeeds(url)
-      }
     }
-  },
-  watch: {
-    formatDate (val) {
-      if (val == null) {
-        this.optRecord.date = null
-      }
-    }
-  },
-  data () {
-    return {
-      imgVisible: false,
-      dialogImgUrl: null,
-      total: 0,
-      pagesize: 10,
-      currentPage: 1,
-      currentAppName: null,
-      formatDate: null,
-      loading: false,
-      options: [],
-      optRecord: {
-        name: null,
-        date: null
-      },
-      feedbasks: Array,
-    }
-  }
 }
 </script>
