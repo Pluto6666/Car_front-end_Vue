@@ -5,7 +5,7 @@
        <router-link to="/welcome" style="text-decoration: none;">
 
        <div class="logo_tile">
-        <img src="../assets/adminlogo.jpg" alt="" height="70px">
+        <img src="../assets/mainLogo.jpg" alt="" height="70px">
         <h2>二手车后台管理系统</h2>
       </div>
       </router-link>
