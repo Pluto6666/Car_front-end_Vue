@@ -112,17 +112,14 @@
         </el-table-column>
         <el-table-column prop="kilometer" label="公里数">
         </el-table-column>
-        <el-table-column width="185" prop="ifPass" label="审核状态操作">
+        <el-table-column label="订单状态" prop="ifPass">
+            <!-- 作用域插槽 -->
             <template slot-scope="scope">
-                <!--修改按钮-->
-                <el-tooltip class="item" effect="dark" content="审核通过" placement="top" :enterable="false">
-                    <el-button type="primary" plain size="mini" icon="el-icon-edit" @click="ifPass1(scope.row)"></el-button>
-                </el-tooltip>
-
-                <!--删除按钮-->
-                <el-tooltip class="item" effect="dark" content="审核未通过" placement="top" :enterable="false">
-                    <el-button type="danger" plain size="mini" icon="el-icon-delete" @click="ifPass0(scope.row)"></el-button>
-                </el-tooltip>
+                <el-switch v-model="scope.row.mg_state" @change="userStateChanged(scope.row)"></el-switch>
+            </template>
+        </el-table-column>
+        <el-table-column width="60" label="操作">
+            <template slot-scope="scope">
 
                 <!--分配角色-->
                 <el-tooltip class="item" effect="dark" content="Car_id生成并传入后端" placement="top" :enterable="false">
@@ -212,7 +209,13 @@ export default {
         },
         // 监听 当前状态值 改变事件/////////
         userStateChanged(carinfo) {
-            console.log(carinfo)
+            console.log(carinfo);
+            if (carinfo.ifPass == 1) {
+                carinfo.ifPass = 0;
+
+            } else {
+                carinfo.ifPass = 1;
+            }
         },
         // 监听 添加用户对话框的关闭事件
         addDialogClosed() {
