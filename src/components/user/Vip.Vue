@@ -72,7 +72,7 @@
 				</el-tooltip>
 				<!--分配角色-->
 				<el-tooltip class="item" effect="dark" content="会员权限" placement="top" :enterable="false">
-     				<el-button type="warning" plain size="mini" icon="el-icon-bell"></el-button>
+     				<el-button type="warning" plain size="mini" icon="el-icon-bell" @click="showPermission(scope)"></el-button>
 				</el-tooltip>
       		</template>
         </el-table-column>
@@ -160,7 +160,40 @@
       </span>
   </el-dialog>
   
-
+  <!--会员权限对话框-->
+  <el-dialog 
+      title="会员权限" 
+      :visible.sync="perDialogVisible" 
+      width="40%" 
+      height="60%">
+      <el-table
+        :data="permissionList" 
+        style="width: 100%" 
+        border 
+        :stripe="true">
+        <el-table-column 
+          type="index" 
+          label="#">
+        </el-table-column>
+        <el-table-column 
+          prop="permissions" 
+          label="权限名称">
+        </el-table-column>
+        <el-table-column 
+          prop="vip_level" 
+          label="权限等级">
+          <template slot-scope="scope" v-if="scope.row">
+              <el-tag v-if="scope.row.vip_level == 1">一级</el-tag>
+              <el-tag v-else-if="scope.row.vip_level == 2" type="success">二级</el-tag>
+              <el-tag v-else-if="scope.row.vip_level == 3" type="warning">三级</el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+      
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="perDialogVisible = false">关 闭</el-button>
+      </span>
+  </el-dialog>
   </div>
 </template>
 
@@ -218,7 +251,9 @@ export default {
           surplus:[
             {required:true, message:'请输入剩余天数',trigger:'blur'}
           ]
-        }
+        },
+        perDialogVisible:false,
+        permissionList:[]
 		}
 	},
   created(){
@@ -374,6 +409,23 @@ export default {
         console.log(error);
       })
       this.getVipList()
+    },
+
+    //会员权限查看
+    async showPermission(scope){
+      Vue.axios.get('/api/permission/'+scope.row.vip_level).then((response)=>{
+        if(response.data.code==1){
+          this.permissionList=response.data.data;
+          console.log(this.permissionList);
+          this.$message.success('查询权限成功');
+        }
+        else{
+          this.$message.error(response.data.message);
+        }
+      }).catch((error)=>{
+        console.log(error);
+      })
+      this.perDialogVisible=true;
     }
   }  
 
