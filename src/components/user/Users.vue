@@ -25,7 +25,8 @@
       	:data="userlist" 
       	style="width: 100%" 
       	border 
-      	:stripe="true">
+      	:stripe="true"
+        v-loading="loading">
         <el-table-column 
         	type="index" 
         	label="">
@@ -210,6 +211,7 @@ export default {
 	components: { VDistpicker },
   data(){
     return {
+      loading:true,
       labelPosition:'top',
 			queryinfo: {
         		query: '', // 用户输入的搜索条件
@@ -319,6 +321,7 @@ export default {
   getUserList(){
       //console.log(this.queryinfo)
       //发起get请求并携带查询参数
+      this.loading=true;
       Vue.axios.post('/api/users',this.queryinfo).then((response)=>{
           //console.log(response);
           //console.log(response.data);
@@ -328,7 +331,7 @@ export default {
 
           if(response.data.code==1){
             this.$message.success('查询用户列表成功！');
-
+            this.loading=false;
           }
           else if(response.data.code==0){
             this.$message.error('查询用户列表失败！');
@@ -336,6 +339,7 @@ export default {
         }).catch((error)=>{
         console.log(error);
       });
+
     },
      // 监听 pageSize 改变的事件
     handleSizeChange(newSize) {

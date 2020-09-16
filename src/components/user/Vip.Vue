@@ -25,7 +25,8 @@
       	:data="viplist" 
       	style="width: 100%" 
       	border 
-      	:stripe="true">
+      	:stripe="true"
+        v-loading="loading">
         <el-table-column 
         	type="index" 
         	label="">
@@ -202,7 +203,8 @@
 export default {
 	data(){
 		return {
-			labelPosition: 'top',
+			loading:true,
+      labelPosition: 'top',
       queryinfo: {
         		query: '', // 用户输入的搜索条件
         		page_num: 1, // 当前请求的是第几页数据
@@ -262,6 +264,7 @@ export default {
 	methods: {
     //根据查询参数获取用户列表
     getVipList(){
+      this.loading=true;
       Vue.axios.post('/api/vippage',this.queryinfo).then((response)=>{
           //console.log(response);
           //console.log(response.data);
@@ -271,7 +274,7 @@ export default {
 
           if(response.data.code==1){
             this.$message.success('查询会员列表成功！');
-
+            this.loading=false;
           }
           else if(response.data.code==0){
             this.$message.error('查询会员列表失败！');

@@ -5,11 +5,11 @@
        <router-link to="/welcome" style="text-decoration: none;">
 
        <div class="logo_tile">
-        <img src="../assets/mainLogo.jpg" alt="" height="70px">
+        <img src="../assets/touming.png" alt="" height="70px">
         <h2>二手车后台管理系统</h2>
       </div>
       </router-link>
-      <el-button type="info" >退出</el-button>
+      <el-button type="info" @click="logout">退出</el-button>
     </el-header>
     <!-- 主体 -->
     <el-container>
@@ -101,6 +101,12 @@
       }
     },
     methods:{
+      logout () {
+        // 清空sessionStorage
+        window.sessionStorage.clear('admin');
+        // 跳转到登录页
+        this.$router.push('/login');
+      },
       toggleCollapse() {
          this.isCollapse = !this.isCollapse
       }
@@ -108,7 +114,7 @@
   }
 
 
-</script>>
+</script>
 
 
 

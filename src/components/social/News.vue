@@ -30,7 +30,8 @@
       	style="width: 100%" 
       	border 
       	:stripe="true"
-      	 :default-sort = "{prop: 'post_date', order: 'descending'}">
+      	 :default-sort = "{prop: 'post_date', order: 'descending'}"
+         v-loading="loading">
       	 <el-table-column 
            type="index"
           label="">
@@ -60,12 +61,6 @@
         	:filter-method="filterPt"
         	filter-placement="bottom-end"
           width=260>
-        </el-table-column>
-        <el-table-column 
-        	prop="reader_num" 
-        	label="阅读人数"
-        	width=120
-          sortable>
         </el-table-column>
         <el-table-column 
         	label="操作">
@@ -120,7 +115,8 @@
 export default {
 	data(){
 		return {
-			queryinfo: {
+			loading:true,
+      queryinfo: {
         		keyword: '', // 用户输入的搜索条件
             author_id:'',
         		page_num: 1, // 当前请求的是第几页数据
@@ -141,9 +137,11 @@ export default {
 	methods: {
     //分页获取新闻列表
     getNewsList(){
+      this.loading=true;
       Vue.axios.post('/api/news/get_pageNews',this.queryinfo).then((response)=>{
         
         if(response.data.code==1){
+          this.loading=false;
            this.$message.success(response.data.message);
            this.newlist=response.data.data.newsSet;
             this.total=response.data.data.total;
