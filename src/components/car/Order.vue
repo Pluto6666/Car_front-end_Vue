@@ -13,8 +13,8 @@
         <el-row :gutter="100">
             <el-col :span="15">
                 <!--搜索区域-->
-                <el-input v-model="order_id" placeholder="请输入订单ID" clearable>
-                    <el-button slot="append" icon="el-icon-search" @click="Search"></el-button><!-- unfinished -->
+                <el-input v-model="user_id" placeholder="请输入订单ID" clearable>
+                    <el-button slot="append" icon="el-icon-search" @click="searchDialogVisible=true"></el-button><!-- unfinished -->
 
                 </el-input>
             </el-col>
@@ -23,13 +23,18 @@
 
     </el-card>
 
-    <!--编辑用户对话框-->
-    <el-dialog title="修改状态" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
+    <el-dialog title="用户订单查询" :visible.sync="searchDialogVisible" width="% " @close="searchDialogClosed">
+        车架号：<el-input v-model="user_info.car_vin" placeholder="请输入车架号"></el-input>
+        卖家ID：<el-input v-model="user_info.seller_id" placeholder="请输入卖家ID"></el-input>
+        买家ID：<el-input v-model="user_info.buyer_id" placeholder="请输入买家ID"></el-input>
+        价格：<el-input v-model="user_info.price" placeholder="请输入价格"></el-input>
 
         <span slot="footer" class="dialog-footer">
-            <el-button @click="editDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="editCar">确 定</el-button>
+            <el-button @click="Search">确定</el-button>
+            <el-button @click="searchDialogVisible=false">关闭</el-button>
+
         </span>
+
     </el-dialog>
 
     <el-dialog title="价格范围筛选" :visible.sync="rangeDialogVisible" width="50%" @close="rangeDialogClosed">
@@ -38,6 +43,7 @@
             <el-table-column type="index" label="">
             </el-table-column>
             <el-table-column prop="order_id" label="订单ID" width="120">
+
             </el-table-column>
 
             <el-table-column prop="car_vin" label="车架号" width="120">
@@ -62,6 +68,36 @@
         </span>
     </el-dialog>
 
+    <el-dialog title="用户订单信息" :visible.sync="orderDialogVisible" width="50%">
+        <!--内容主体区域-->
+        <el-table :data="orderList" style="width: 100%" border :stripe="true">
+
+            <el-table-column prop="order_id" label="订单ID" width="120">
+
+            </el-table-column>
+
+            <el-table-column prop="car_vin" label="车架号" width="120">
+            </el-table-column>
+
+            <el-table-column prop="price" label="价格">
+            </el-table-column>
+            <el-table-column prop="buyer_id" label="买家ID">
+            </el-table-column>
+            <el-table-column prop="seller_id" label="卖家ID">
+            </el-table-column>
+            <el-table-column prop="date_order" label="订单日期">
+            </el-table-column>
+            <el-table-column prop="status" label="审核状态">
+
+            </el-table-column>
+        </el-table>
+        <!--底部按钮区域-->
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="orderDialogVisible = false">确定</el-button>
+
+        </span>
+    </el-dialog>
+
     <!--表格区域-->
     <el-container class="opin_header">
         <el-header style="margin-left: -20px;">
@@ -73,7 +109,7 @@
             <span class="demonstration opin_header_timer">时间</span>
             <el-date-picker v-model="formatDate" type="daterange" align="left" unlink-panels range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd">
             </el-date-picker>
-            <el-button class="opin_header_btn" type="primary" @click="handleQuery">查询</el-button>
+            <el-button class="opin_header_btn" type="primary" @click="handleQuery">筛选</el-button>
         </el-header>
         <el-main style="margin-left: -20px;">
             <el-table :data="orderList" border style="width: 100%;margin-top:-20px;">
@@ -85,7 +121,7 @@
                 </el-table-column>
                 <el-table-column prop="seller_id" align="center" label="卖家ID">
                 </el-table-column>
-                <el-table-column prop="car_id" align="center" label="汽车ID">
+                <el-table-column prop="car_vin" align="center" label="车架号">
                 </el-table-column>
                 <el-table-column prop="price" align="center" label="价格">
                 </el-table-column>
@@ -140,8 +176,8 @@ export default {
             },
             feedbasks: Array,
 
-            //订单ID查询
-            order_id: '',
+            //用户ID查询
+            user_id: '',
             //价格范围选择器
             range: {
                 highprice: '',
@@ -186,6 +222,7 @@ export default {
             editDialogVisible: false, // 控制修改用户信息对话框是否显示
             searchDialogVisible: false, // 修改用户信息的表单数据
             rangeDialogVisible: false, //范围筛选
+            orderDialogVisible: false, //显示用户订单
             editForm: {
                 accident: '',
                 car_vin: '',
@@ -206,11 +243,17 @@ export default {
             },
 
             searchlist: [],
+            user_info: {
+                car_vin: '',
+                seller_id: '',
+                buyer_id: '',
+                price: '',
+            }
         }
     },
 
     created() { // 生命周期函数
-        this.getCarList()
+        this.getOrderList()
     },
     methods: {
         // // 监听 pageSize 改变的事件
@@ -218,16 +261,16 @@ export default {
         //     // console.log(newSize)
         //     this.queryInfo.pagesize = newSize
         //     // 重新发起请求用户列表
-        //     this.getCarList()
+        //     this.getOrderList()
         // },
         // // 监听 当前页码值 改变的事件
         // handleCurrentChange(newPage) {
         //     // console.log(newPage)
         //     this.queryInfo.pagenum = newPage
         //     // 重新发起请求用户列表
-        //     this.getCarList()
+        //     this.getOrderList()
         // },
-        async getCarList() {
+        async getOrderList() {
 
             // this.userList = res.data
             setInterval(this.nowTime, 1000);
@@ -260,6 +303,10 @@ export default {
             // 表单内容重置为空
             this.$refs.addFormRef.resetFields()
         },
+        searchDialogClosed() {
+            // 表单内容重置为空
+            this.$refs.addFormRef.resetFields()
+        },
         // ifPass1(carinfo) {
         //     carinfo.ifPass = 1;
         //     console.log(carinfo);
@@ -280,21 +327,21 @@ export default {
 
         },
         //修改订单状态接口
-        editCar() {
-            Vue.axios.post('/api/Audit/notaudit', this.editForm).then((response) => {
-                //console.log(response);
-                if (response.data.code == 1) {
-                    this.$message.success('修改审核状态成功!');
-                } else if (response.data.code == 0) {
-                    this.$message.error('修改审核状态失败!');
-                }
-            }).catch((error) => {
-                console.log(error);
-            });
-            this.getCarList();
-            this.editDialogVisible = false
+        // editCar() {
+        //     Vue.axios.post('/api/Audit/notaudit', this.editForm).then((response) => {
+        //         //console.log(response);
+        //         if (response.data.code == 1) {
+        //             this.$message.success('修改审核状态成功!');
+        //         } else if (response.data.code == 0) {
+        //             this.$message.error('修改审核状态失败!');
+        //         }
+        //     }).catch((error) => {
+        //         console.log(error);
+        //     });
+        //     this.getOrderList();
+        //     this.editDialogVisible = false
 
-        },
+        // },
         // 监听 修改用户信息对话框的关闭事件
         editDialogClosed() {
             // 表单内容重置为空
@@ -325,20 +372,20 @@ export default {
 
         //搜索单条订单ID信息
         Search() {
-            console.log(this.car_vin);
-            Vue.axios.get('/api/Audit/audit/' + this.car_vin).then((response) => {
+            console.log(this.user_id);
+
+            Vue.axios.post('/api/MyInformation/myorder/' + this.user_id).then((response) => {
                 if (response.data.code == 1) {
                     this.searchlist = response.data.data;
                     console.log(this.searchlist);
-                    this.$message.success("查询车架号信息成功！");
+                    this.$message.success("用户订单信息成功！");
                 } else {
                     this.$message.error(response.data.message);
                 }
             }).catch((error) => {
                 console.log(error);
             })
-
-            this.searchDialogVisible = true
+            this.orderDialogVisible = true;
 
         },
 
